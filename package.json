@@ -1,0 +1,20 @@
+{"name": "launch",
+ "version": "0.0.3",
+ "description": "Launch Application Framework",
+ "main": "lib/launch.js",
+ "dependencies": {
+ },	   
+ "bin": { "launch" : "./cli/launch"},
+ "keywords": [
+	 "launch",
+	 "mvc",
+	 "model",
+	 "view",
+	 "controller",
+	 "rad"
+ ],
+ "repository" : {
+	 "type" : "git",
+	 "url" : "git@github.com:kudige/launch.git"
+ }
+}

@@ -1,0 +1,11 @@
+<tr class="{ldelim}cycle value1='' value2=altrow}">
+  {ldelim}foreach from={=controller}_schema.fields item=field}
+  <td><span>
+	{ldelim}if {=controller}_schema.primary === field}
+	<a href="/{=controller|plural}/info/{ldelim}= {=controller}[field]|encode}">{ldelim}= {=controller}[field]}</a>
+	{ldelim}else}
+	{ldelim}= {=controller}[field]}
+	{ldelim}/if}</span>
+  </td>
+  {ldelim}/foreach}
+</tr>

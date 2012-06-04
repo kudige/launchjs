@@ -1,0 +1,242 @@
+#!/usr/bin/env node
+var cli = require('cli').enable('daemon', 'status'),
+child = require('child_process'),
+fs = require('fs'),
+path = require('path'),
+utils = require('../lib/utils'),
+inflector = require('../lib/inflector'),
+helpers = require('../lib/helpers'),
+Transformer = require('transformer')
+
+var Helper = function() {
+}
+
+Launch.extend(Helper.prototype,{
+	filter_fieldname: function(field) {
+		if (field.match(/^([^:]+)/))
+			field=RegExp.$1
+		return field
+	},
+
+	filter_uniquefield: function(fields) {
+		var found = null
+		Launch.each(fields, function(i, field) {
+			if (field.match(/^(.*):primary/))
+				found = RegExp.$1
+		})
+		return found
+	}
+})
+var helper = new Helper
+
+function isdir(path) {
+	var info = fs.lstatSync(path)
+	return info.isDirectory()
+}
+
+function exists(path) {
+	try {
+		var info = fs.lstatSync(path)
+		return !(!info)
+	}catch(e) {
+		return false
+	}
+}
+
+function transform_skeleton(f,vars, t) {
+	var output =  t.process(f, vars)
+	return output
+}
+
+function removeAll(src_root) {
+	var files = fs.readdirSync(src_root)
+	Launch.each(files, function(i, f) {
+		var src = path.resolve(src_root, f)
+		if (isdir(src)) {
+			removeAll(src)
+		} else {
+			removeFile(src)
+		}
+	})
+	fs.rmdirSync(src_root)
+}
+
+function removeFile(file) {
+	if (exists(file)) {
+		cli.info("deleted %s".format(file))
+		fs.unlinkSync(file)
+	}
+}
+
+function copy_skeleton(dest_root, src_root, vars, t) {
+	vars = vars || {}
+	if (!t) {
+		t = new Transformer
+		t.addExtension(new helpers.TemplateHelper)
+		t.addExtension(helper)
+	}
+
+	var files = fs.readdirSync(src_root)
+	Launch.each(files, function(i, f) {
+		var src = path.resolve(src_root, f)
+		var destname = transform_skeleton(f,vars,t)
+		var dest = path.resolve(dest_root, destname)
+		if (isdir(src)) {
+			if (!exists(dest)) {
+				cli.info("mkdir %s".format(dest))
+				fs.mkdirSync(dest, 0777)
+			}
+			return copy_skeleton(dest, src, vars, t)
+		} else {
+			var data = ''+fs.readFileSync(src)
+			data = transform_skeleton(data,vars, t)
+			fs.writeFileSync(dest, data)
+			cli.info("Copying %s".format(dest))
+		}
+	})
+}
+
+// CRUD stuff
+function relationsFromFields(fields) {
+	var result = []
+	Launch.each(fields, function(i, field) {
+		if (field.match(/^(.*?):(.*)$/)) {
+				fieldname = RegExp.$1
+			target = RegExp.$2
+			if (target !== 'primary')
+				result.push({field: fieldname, target: target})
+		}
+	})
+	return result
+}
+
+var Launcher = function() {
+}
+
+Launcher.prototype.init =function(args, options) {
+	if (args.length <= 0) {
+		cli.fatal("Usage: launch init <application name>")
+	}
+	var appname = args[0]
+	if (fs.readdirSync('./').length > 0) {
+//		cli.fatal("Current directory is not empty")
+	}
+	var self = this
+	var config_tpl = __dirname + '/data/config.js'
+	var skeleton_dir = __dirname + '/skeletons/app'
+	var cpline = 'cp -pR "' + skeleton_dir + '"/* ./'
+	var cp = child.exec(cpline)
+	console.log(cpline)
+	cp.on('exit', function(code) {
+		if (code != 0) {
+			cli.fatal("Unable to copy app skeleton from " + skeleton_dir + " error code " + code)
+		}
+
+		var transformer = new Transformer
+		var vars = {
+			appname: appname,
+			httpPort: options.http_port,
+			websockPort: options.websock_port
+		}
+		var config_js = transformer.process(fs.readFileSync(config_tpl) + '', vars)
+		fs.writeFileSync('config.js', config_js)
+		cli.ok("application initialized")
+		//self.addcontroller([appname.toLowerCase()], {})
+		//cli.info("you may edit config.js to configure the application")
+	})
+}
+
+Launcher.prototype.run =function(args, options) {
+	require('launch').launch(process.cwd() + '/')
+}
+
+Launcher.prototype.addmodule =function(args, options) {
+	if (args.length != 1)
+		cli.fatal("Usage: launch addmodule <modulename>")
+
+	var module_dir = "modules/" + args[0]
+	
+	try {
+		if (fs.statSync(module_dir)) {
+			cli.fatal("Module %s already exists".format(module_dir))
+		}
+	} catch(e) {
+	}
+
+	var index_tpl = __dirname + '/skeletons/module/index.js'
+	var skeleton_dir = __dirname + '/skeletons/module'
+	var cp = child.exec('cp -R "%s" "%s"'.format(skeleton_dir, module_dir))
+	cp.on('exit', function(code) {
+		if (code != 0) {
+			cli.fatal("Unable to copy app skeleton from " + skeleton_dir)
+		}
+
+		var transformer = new Transformer
+		var vars = {
+			module: args[0]
+		}
+		var index_js = transformer.process(fs.readFileSync(index_tpl) + '', vars)
+		fs.writeFileSync('%s/index.js'.format(module_dir), index_js)
+		cli.ok("module %s created at %s".format(args[0], module_dir))
+	})
+	
+}
+
+Launcher.prototype.addcontroller =function(args, options) {
+	if (args.length !== 1)
+		cli.fatal("Usage: launch addcontroller <controllername>")
+	
+	var controller = args[0]
+	var src = path.resolve(__dirname,'skeletons', 'scaffolds', 'crud')
+	var dst = '.'
+	copy_skeleton(dst, src, {controller: controller})
+}
+
+Launcher.prototype.generate =function(args, options) {
+	if (args.length < 2)
+		cli.fatal("Usage: launch generate <controller> <scaffold> [arguments]")
+	
+	var controller = args.shift()
+	var scaffold = args.shift()
+	var fields = args
+	var src = path.resolve(__dirname,'skeletons', 'scaffolds', scaffold)
+	var dst = '.'
+	var relations = relationsFromFields(fields)
+	var vars = {controller: controller, fields: fields, relations: relations}
+	copy_skeleton(dst, src, vars)
+}
+
+Launcher.prototype.delcontroller =function(args, options) {
+	if (args.length !== 1)
+		cli.fatal("Usage: launch addcontroller <controllername>")
+	
+	var controller = args[0].toLowerCase()
+	removeFile(path.resolve('controllers', controller+'.js'))
+	removeAll(path.resolve('views', controller))
+}
+
+Launcher.prototype.x =function(args, options) {
+}
+
+Launcher.prototype.script =function(args, options) {
+	if (args.length < 1)
+		cli.fatal("Usage: launch script <scriptname> [args]")
+
+	var script = args[0]
+	var scriptpath = path.resolve(process.cwd(), 'bin', script+'.js')
+	require('launch').launch(process.cwd() + '/', true)
+	var Script = require(scriptpath)
+	Script(args[1])
+}
+
+
+cli.parse({
+    http_port:  ['p', 'Listen port', 'number', 8001],
+    websock_port:  ['w', 'Default websock port', 'number', 8002],
+},['init', 'run', 'addmodule', 'addcontroller', 'delcontroller', 'generate', 'script', 'x']);
+
+cli.main(function(args, options) {
+	var launcher = new Launcher
+	launcher[cli.command](args, options)
+})
+

@@ -1,0 +1,9 @@
+<h2>{=controller|caps} information</h2>
+
+<h3>{ldelim}={=controller}}</h3>
+
+{ldelim}include name={=controller}:info}
+<a href="/{=controller|plural}/edit/{ldelim}${=controller}[{=controller}_schema.primary]}">Edit</a> | 
+<a href="/{=controller|plural}/add">Add</a> |
+<a href="/{=controller|plural}/">List</a>
+

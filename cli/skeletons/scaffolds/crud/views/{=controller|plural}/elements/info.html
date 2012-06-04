@@ -1,0 +1,10 @@
+{ldelim}foreach from={=controller}_schema.fields item=field}
+<p>
+{ldelim}set relation=`{=controller}_schema.relations[field]`}
+{ldelim}if !relation}
+{ldelim}$field|caps}: {ldelim}${=controller}[field]}
+{ldelim}else}
+{ldelim}$field|caps}: <a href='/{ldelim}=relation|plural}/info/{ldelim}${=controller}[field]}'>{ldelim}${=controller}[field]}</a>
+{ldelim}/if}
+</p>
+{ldelim}/foreach}

@@ -1,0 +1,14 @@
+<h2>{=controller|caps} list</h2>
+
+<h3>There are {ldelim}={=controller|plural}.length|counter}</h3>
+
+<table  cellspacing="0" cellpadding="0">
+{ldelim}include name={=controller}:hdr}
+{ldelim}foreach from={=controller|plural} item={=controller}}
+{ldelim}include name={=controller}:row}
+{ldelim}/foreach}
+</table>
+
+<p>
+<a href="/{=controller|plural}/add">Add</a>
+</p>

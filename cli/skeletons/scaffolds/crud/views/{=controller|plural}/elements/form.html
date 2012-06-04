@@ -1,0 +1,17 @@
+{ldelim}form}
+{ldelim}foreach from={=controller}_schema.fields item=field}
+{ldelim}set field_name=`'{=controller}.'+field`}
+{ldelim}if action === 'edit' && {=controller}_schema.primary === field}
+{ldelim}set field_type=hidden}
+{ldelim}else}
+{ldelim}set field_type=text}
+{ldelim}/if}
+{ldelim}set relation=`{=controller}_schema.relations[field]`}
+{ldelim}if !relation}
+{ldelim}input name=`field_name` type=`field_type`}
+{ldelim}else}
+{ldelim}select name=`field_name` relation=`relation`}
+{ldelim}/if}
+{ldelim}/foreach}
+{ldelim}submit}
+{ldelim}/form}
