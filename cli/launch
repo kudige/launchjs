@@ -44,7 +44,7 @@ function exists(path) {
 }
 
 function transform_skeleton(f,vars, t) {
-	var output =  t.process(f, vars)
+	var output =  t.applyTemplateSync(f, vars)
 	return output
 }
 
@@ -138,11 +138,12 @@ Launcher.prototype.init =function(args, options) {
 			httpPort: options.http_port,
 			websockPort: options.websock_port
 		}
-		var config_js = transformer.process(fs.readFileSync(config_tpl) + '', vars)
-		fs.writeFileSync('config.js', config_js)
-		cli.ok("application initialized")
-		//self.addcontroller([appname.toLowerCase()], {})
-		//cli.info("you may edit config.js to configure the application")
+		transformer.applyTemplate(fs.readFileSync(config_tpl) + '', vars).on('ready', function(config_js) {
+			fs.writeFileSync('config.js', config_js)
+			cli.ok("application initialized")
+			//self.addcontroller([appname.toLowerCase()], {})
+			//cli.info("you may edit config.js to configure the application")
+		})
 	})
 }
 
@@ -175,9 +176,10 @@ Launcher.prototype.addmodule =function(args, options) {
 		var vars = {
 			module: args[0]
 		}
-		var index_js = transformer.process(fs.readFileSync(index_tpl) + '', vars)
-		fs.writeFileSync('%s/index.js'.format(module_dir), index_js)
-		cli.ok("module %s created at %s".format(args[0], module_dir))
+		transformer.applyTemplate(fs.readFileSync(index_tpl) + '', vars).on('ready', function(index_js) {
+			fs.writeFileSync('%s/index.js'.format(module_dir), index_js)
+			cli.ok("module %s created at %s".format(args[0], module_dir))
+		})
 	})
 	
 }

@@ -15,6 +15,7 @@ config.module = {
 	path: 'controllers',
 	defaultModule: '{$appname|lower}',
 	// Should all the available modules be autoloaded
+	serverScripts: false,
 	autoload: true
 }
 
