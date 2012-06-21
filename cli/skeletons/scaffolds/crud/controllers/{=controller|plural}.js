@@ -10,16 +10,16 @@ Launch.extend({=controller|caps}Controller.prototype,{
 		this.sendView('error')
 	},
 	_onAdd: function({=controller|lower}) {
-		this.redirect('info/%s'.format({=controller|lower}.name))
+		this.redirect('info/%s'.format({=controller|lower}.key()))
 	},
 	_onReady: function({=controller|lower}) {
-		if ({=controller|lower}.name)
-			return this.redirect('info/%s'.format({=controller|lower}.name))
+		if ({=controller|lower}.key())
+			return this.redirect('info/%s'.format({=controller|lower}.key()))
 		this.output(JSON.stringify({=controller|lower}.get()))
 	},
 	_onSave: function({=controller|lower}) {
 		console.log('on save')
-		this.redirect('info/%s'.format({=controller|lower}.name))
+		this.redirect('info/%s'.format({=controller|lower}.key()))
 	},
 	_onExists: function() {
 		this.sendView('exists')

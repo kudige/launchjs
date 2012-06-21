@@ -24,6 +24,8 @@ Launch.extend(Helper.prototype,{
 			if (field.match(/^(.*):primary/))
 				found = RegExp.$1
 		})
+		if (!found)
+			found = fields[0]
 		return found
 	}
 })
@@ -196,11 +198,15 @@ Launcher.prototype.addcontroller =function(args, options) {
 
 Launcher.prototype.generate =function(args, options) {
 	if (args.length < 2)
-		cli.fatal("Usage: launch generate <controller> <scaffold> [arguments]")
+		cli.fatal("Usage: launch generate <controller> <scaffold> [model fields]")
 	
 	var controller = args.shift()
 	var scaffold = args.shift()
 	var fields = args
+	if (!fields) {
+		cli.fatal("Please enter atleast one model field")
+	}
+
 	var src = path.resolve(__dirname,'skeletons', 'scaffolds', scaffold)
 	var dst = '.'
 	var relations = relationsFromFields(fields)
