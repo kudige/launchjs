@@ -227,10 +227,6 @@ Tests.prototype.test1_6 = function() {
 	})
 }
 
-/*  model testing  */
-Tests.prototype.testmodel1 = function() {
-
-}
 
 /* --------------- END TEST ROUTINES ------------------- */
 

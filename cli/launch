@@ -150,7 +150,7 @@ Launcher.prototype.init =function(args, options) {
 }
 
 Launcher.prototype.run =function(args, options) {
-	require('launch').launch(process.cwd() + '/')
+	require('launchjs').launch(process.cwd() + '/')
 }
 
 Launcher.prototype.addmodule =function(args, options) {
