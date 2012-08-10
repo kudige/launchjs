@@ -1,8 +1,13 @@
-{"name": "launch",
+{"name": "launchjs",
  "version": "0.0.3",
  "description": "Launch Application Framework",
  "main": "lib/launch.js",
  "dependencies": {
+ 	"cli",
+    "daemon",
+    "response",
+	"dynobj",
+	"transformer"
  },	   
  "bin": { "launch" : "./cli/launch"},
  "keywords": [
