@@ -1,5 +1,5 @@
 {"name": "launchjs",
- "version": "0.0.3",
+ "version": "0.0.4",
  "description": "Launch Application Framework",
  "main": "lib/launch.js",
  "dependencies": {
