@@ -3,9 +3,9 @@
 <h3>There are {ldelim}={=controller|plural}.length|counter}</h3>
 
 <table  cellspacing="0" cellpadding="0">
-{ldelim}include name={=controller}:hdr}
+{ldelim}include name={=controller|plural}:hdr}
 {ldelim}foreach from={=controller|plural} item={=controller}}
-{ldelim}include name={=controller}:row}
+{ldelim}include name={=controller|plural}:row}
 {ldelim}/foreach}
 </table>
 

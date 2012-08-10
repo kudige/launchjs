@@ -2,7 +2,7 @@
 
 <h3>{ldelim}={=controller}[{=controller}_schema.primary]}</h3>
 
-{ldelim}include name={=controller}:info}
+{ldelim}include name={=controller|plural}:info}
 <a href="/{=controller|plural}/edit/{ldelim}${=controller}[{=controller}_schema.primary]}">Edit</a> | 
 <a href="/{=controller|plural}/add">Add</a> |
 <a href="/{=controller|plural}/">List</a>

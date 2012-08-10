@@ -1,5 +1,5 @@
 <h2>Edit {=controller|caps}</h2>
 
-<h3>{ldelim}={=controller}}</h3>
+<h3>{ldelim}={=controller}[{=controller}_schema.primary]}</h3>
 
-{ldelim}include name={=controller}:form}
+{ldelim}include name={=controller|plural}:form}

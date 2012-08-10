@@ -200,7 +200,7 @@ Launcher.prototype.generate =function(args, options) {
 	if (args.length < 2)
 		cli.fatal("Usage: launch generate <controller> <scaffold> [model fields]")
 	
-	var controller = args.shift()
+	var controller = args.shift().toLowerCase().singularize()
 	var scaffold = args.shift()
 	var fields = args
 	if (!fields) {
