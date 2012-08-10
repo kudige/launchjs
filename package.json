@@ -3,11 +3,14 @@
  "description": "Launch Application Framework",
  "main": "lib/launch.js",
  "dependencies": {
- 	"cli",
-    "daemon",
-    "response",
-	"dynobj",
-	"transformer"
+	 "cli" : ">=0.4.4",
+	 "daemon" : ">=0.5.1",
+	 "dynobj" : ">=0.0.4",
+	 "transformer" : ">=0.0.8",
+	 "jsdom" : ">=0.2.15",
+	 "mime" : ">=1.2.7",
+	 "mongous" : ">=0.2.3",
+	 "response" : ">=0.1.0"
  },	   
  "bin": { "launch" : "./cli/launch"},
  "keywords": [
