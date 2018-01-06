@@ -3,3 +3,4 @@ Ajax based application support:
 - Widget support
 - Testing github/discord integration
 - ANother testing line
+- ANother testing line
