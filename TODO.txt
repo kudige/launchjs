@@ -1,3 +1,4 @@
 Ajax based application support:
 - API support for each module
 - Widget support
+- Testing github/discord integration
